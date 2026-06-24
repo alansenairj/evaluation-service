@@ -1,7 +1,7 @@
 package main
 
 import (
-	"context"
+	
 	"crypto/sha1"
 	"encoding/binary"
 	"encoding/json"
@@ -11,6 +11,7 @@ import (
 	"net/http"
 	"sync"
 	"time"
+	"os"
 )
 
 const (
