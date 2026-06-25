@@ -75,9 +75,15 @@ func main() {
 	log.Println("Conectado ao Redis com sucesso!")
 
 	// Cliente SQS (AWS SDK)
+	// aws-sdk-go v1 não lê AWS_ENDPOINT_URL do ambiente (apenas boto3 >= 1.28.0 faz isso).
+	// Lemos manualmente para redirecionar para o Floci em dev local.
 	var sqsSvc *sqs.SQS
 	if sqsQueueURL != "" {
-		sess, err := session.NewSession(&aws.Config{Region: aws.String(awsRegion)})
+		cfg := &aws.Config{Region: aws.String(awsRegion)}
+		if endpoint := os.Getenv("AWS_ENDPOINT_URL"); endpoint != "" {
+			cfg.Endpoint = aws.String(endpoint)
+		}
+		sess, err := session.NewSession(cfg)
 		if err != nil {
 			log.Fatalf("Não foi possível criar sessão AWS: %v", err)
 		}
