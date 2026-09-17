@@ -1,0 +1,31 @@
+# Destino: alansenairj/evaluation-service -> .github/workflows/ci.yml
+
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ci:
+    uses: alansenairj/togglemaster-gitops/.github/workflows/ci-go.yml@main
+
+  cd:
+    needs: ci
+    permissions:
+      contents: read
+      id-token: write
+    uses: alansenairj/togglemaster-gitops/.github/workflows/cd-container.yml@main
+    with:
+      service: evaluation-service
+      ecr_repository: togglemaster/evaluation-service
+      gitops_path: apps/eval
+    secrets:
+      GITOPS_TOKEN: ${{ secrets.GITOPS_TOKEN }}
